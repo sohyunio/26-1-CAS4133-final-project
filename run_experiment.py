@@ -100,10 +100,9 @@ def calc_metrics(results, attack_labels=("malicious", "subtle")):
 
 # Visualization
 
-def plot_results(all_metrics: dict, save_path="results/results.png"):
-    """
-    all_metrics: {model_size: {method: {asr, latency, fidelity}}}
-    """
+def plot_results(all_metrics: dict, save_path=None):
+    if save_path is None:
+        save_path = os.path.join(RESULTS_DIR, "results.png")
     model_sizes = list(all_metrics.keys())
     methods     = ["baseline0", "baseline1", "ours"]
     labels      = ["Baseline 0\n(No Guard)", "Baseline 1\n(Prompt Only)", "Ours\n(Hybrid)"]
@@ -143,8 +142,10 @@ def plot_results(all_metrics: dict, save_path="results/results.png"):
                  fontsize=13, fontweight="bold")
     plt.tight_layout()
     plt.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
-    print(f"[OK] Saved {save_path}")
+    plt.close()
+    print(f"✅ 차트 저장: {save_path}")
+
+
 
 
 # Main entry point
