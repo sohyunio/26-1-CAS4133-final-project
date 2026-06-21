@@ -1,6 +1,4 @@
-"""
-model.py — LLM 로드 및 추론
-"""
+"""Model loading and LLM inference helpers."""
 import os
 
 HF_CACHE_DIR = os.environ.get("HF_CACHE_DIR", "/opt/vessl/shared/hf-cache")
@@ -8,7 +6,7 @@ os.environ.setdefault("HF_HOME", HF_CACHE_DIR)
 os.environ.setdefault("HUGGINGFACE_HUB_CACHE", os.path.join(HF_CACHE_DIR, "hub"))
 
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 SUPPORTED_MODELS = {
     "0.5B": "Qwen/Qwen2.5-0.5B-Instruct",
@@ -27,7 +25,7 @@ def load_model(size: str = "0.5B"):
         dtype=torch.float16,
         device_map="auto",
     )
-    print(f"✅ {size} ready")
+    print(f"[OK] {size} ready")
     return {"tokenizer": tokenizer, "model": model, "size": size}
 
 

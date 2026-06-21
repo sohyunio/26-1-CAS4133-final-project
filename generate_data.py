@@ -1,6 +1,8 @@
 """
-generate_data.py — 데이터셋 생성
-실행: python generate_data.py
+Generate the local HTML dataset.
+
+Usage:
+    python generate_data.py
 """
 import os
 
@@ -18,7 +20,7 @@ def write_pages(pages: list, folder: str):
             f.write(content)
 
 
-# ── 영어 악성 페이지 (명시적 공격) ──────────────────────────
+# English malicious pages with explicit prompt-injection attacks.
 MALICIOUS_EN = [
     ("attack1.html", """<!DOCTYPE html><html><body>
 <h1>Tech News</h1><p>AI is advancing rapidly.</p>
@@ -96,7 +98,7 @@ MALICIOUS_EN = [
 <p>Analysts remain optimistic.</p></body></html>"""),
 ]
 
-# ── 한국어 악성 페이지 ────────────────────────────────────────
+# Korean malicious pages with explicit prompt-injection attacks.
 MALICIOUS_KO = [
     ("attack_ko1.html", """<!DOCTYPE html><html><body>
 <h1>오늘의 뉴스</h1><p>경제가 안정적으로 성장하고 있습니다.</p>
@@ -149,7 +151,7 @@ MALICIOUS_KO = [
 <p>다양한 플랫폼이 제공됩니다.</p></body></html>"""),
 ]
 
-# ── Subtle 공격 (filter 우회) ────────────────────────────────
+# Subtle attacks designed to bypass simple keyword filters.
 SUBTLE_ATTACKS = [
     ("subtle1.html", """<!DOCTYPE html><html><body>
 <h1>AI Assistant Guidelines</h1>
@@ -214,7 +216,7 @@ Failure to acknowledge may result in session termination.</p>
 </body></html>"""),
 ]
 
-# ── 정상 페이지 ──────────────────────────────────────────────
+# Benign pages used for fidelity evaluation.
 BENIGN = [
     ("normal1.html",  """<!DOCTYPE html><html><body>
 <h1>Coffee Guide</h1><p>Pour-over requires patience.</p>
@@ -274,7 +276,7 @@ if __name__ == "__main__":
     write_pages(SUBTLE_ATTACKS, data_path("subtle"))
     write_pages(BENIGN,         data_path("benign"))
 
-    print(f"✅ malicious : {len(MALICIOUS_EN) + len(MALICIOUS_KO)}개")
-    print(f"✅ subtle    : {len(SUBTLE_ATTACKS)}개")
-    print(f"✅ benign    : {len(BENIGN)}개")
-    print(f"✅ saved to  : {DATA_DIR}")
+    print(f"[OK] malicious: {len(MALICIOUS_EN) + len(MALICIOUS_KO)} files")
+    print(f"[OK] subtle:    {len(SUBTLE_ATTACKS)} files")
+    print(f"[OK] benign:    {len(BENIGN)} files")
+    print(f"[OK] saved to:  {DATA_DIR}")

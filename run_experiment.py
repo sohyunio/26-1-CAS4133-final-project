@@ -1,8 +1,13 @@
 """
-run_experiment.py — 실험 실행 및 결과 저장
-실행: python run_experiment.py
+Run the full experiment and save metrics.
+
+Usage:
+    python run_experiment.py
 """
-import os, json, time
+import json
+import os
+import time
+
 import numpy as np
 import matplotlib.pyplot as plt
 from bs4 import BeautifulSoup
@@ -10,7 +15,7 @@ from bs4 import BeautifulSoup
 from model import load_model
 from defense import baseline0, baseline1, hybrid_defense, is_attacked
 
-# ── 설정 ─────────────────────────────────────────────────────
+# Configuration
 MODEL_SIZES   = ["0.5B", "3B"]
 PROJECT_DATA_ROOT = os.environ.get("PROJECT_DATA_ROOT", "/opt/vessl/shared/project-data")
 DATA_DIR = os.environ.get("PROJECT_DATA_DIR", os.path.join(PROJECT_DATA_ROOT, "data"))
@@ -24,7 +29,7 @@ RESULTS_DIR = os.environ.get("PROJECT_RESULTS_DIR", os.path.join(PROJECT_DATA_RO
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 
-# ── 실험 ─────────────────────────────────────────────────────
+# Experiment
 
 def read_page(filepath):
     with open(filepath, encoding="utf-8") as f:
@@ -33,7 +38,7 @@ def read_page(filepath):
     return text, html
 
 
-def run_experiment(bundle, folder, label, max_files=None):
+def run_experiment(bundle, folder, label, max_files=None, judge_bundle=None):
     results = []
     files = sorted(f for f in os.listdir(folder) if f.endswith(".html"))
     if max_files:
@@ -49,9 +54,9 @@ def run_experiment(bundle, folder, label, max_files=None):
         entry = {
             "file":  fname,
             "label": label,
-            "baseline0": {"response": r0, "attacked": is_attacked(r0, bundle), "latency": l0},
-            "baseline1": {"response": r1, "attacked": is_attacked(r1, bundle), "latency": l1},
-            "ours":      {"response": r2, "attacked": is_attacked(r2, bundle), "latency": l2},
+            "baseline0": {"response": r0, "attacked": is_attacked(r0, judge_bundle), "latency": l0},
+            "baseline1": {"response": r1, "attacked": is_attacked(r1, judge_bundle), "latency": l1},
+            "ours":      {"response": r2, "attacked": is_attacked(r2, judge_bundle), "latency": l2},
         }
         results.append(entry)
         print(f"  {fname:<30} B0:{entry['baseline0']['attacked']} "
@@ -59,7 +64,7 @@ def run_experiment(bundle, folder, label, max_files=None):
     return results
 
 
-# ── 지표 계산 ────────────────────────────────────────────────
+# Metric calculation
 
 def calc_metrics(results, attack_labels=("malicious", "subtle")):
     attack = [r for r in results if r["label"] in attack_labels]
@@ -93,7 +98,7 @@ def calc_metrics(results, attack_labels=("malicious", "subtle")):
     }
 
 
-# ── 시각화 ───────────────────────────────────────────────────
+# Visualization
 
 def plot_results(all_metrics: dict, save_path="results/results.png"):
     """
@@ -139,12 +144,13 @@ def plot_results(all_metrics: dict, save_path="results/results.png"):
     plt.tight_layout()
     plt.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.show()
-    print(f"✅ {save_path} 저장")
+    print(f"[OK] Saved {save_path}")
 
 
-# ── 메인 ─────────────────────────────────────────────────────
+# Main entry point
 
 if __name__ == "__main__":
+    judge_bundle = load_model("3B")
     all_metrics = {}
 
     for size in MODEL_SIZES:
@@ -158,19 +164,20 @@ if __name__ == "__main__":
             print(f"\n-- {label} --")
             res = run_experiment(
                 bundle, folder, label,
-                max_files=MAX_FILES[label]
+                max_files=MAX_FILES[label],
+                judge_bundle=judge_bundle
             )
             all_results.extend(res)
 
-        # 저장
+        # Save per-model raw results.
         out_path = os.path.join(RESULTS_DIR, f"results_{size}.json")
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(all_results, f, ensure_ascii=False, indent=2)
-        print(f"\n✅ {out_path} 저장")
+        print(f"\n[OK] Saved {out_path}")
 
         all_metrics[size] = calc_metrics(all_results)
 
-        # 콘솔 요약
+        # Print a compact console summary.
         print(f"\n  {'Method':<20} {'ASR':>8} {'Latency':>10} {'Fidelity':>10}")
         print(f"  {'-'*50}")
         for m, lbl in zip(["baseline0","baseline1","ours"],
@@ -178,9 +185,9 @@ if __name__ == "__main__":
             d = all_metrics[size][m]
             print(f"  {lbl:<20} {d['asr']:>7.1f}% {d['latency']:>9.2f}s {d['fidelity']:>9.1f}%")
 
-    # 전체 저장 + 시각화
+    # Save aggregate metrics and plot the final comparison.
     with open(os.path.join(RESULTS_DIR, "all_metrics.json"), "w") as f:
         json.dump(all_metrics, f, indent=2)
 
     plot_results(all_metrics)
-    print("\n🎉 실험 완료")
+    print("\nExperiment complete.")

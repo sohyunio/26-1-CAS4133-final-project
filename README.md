@@ -35,15 +35,19 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-# 1. 데이터셋 생성
+# 1. Generate the dataset
 python generate_data.py
 
-# 2. 실험 실행 (Qwen-0.5B + Qwen-3B 비교)
+# 2. Run the experiment (Qwen-0.5B and Qwen-3B)
 python run_experiment.py
 
-# 3. Gradio 데모
+# 3. Launch the Gradio demo
 python demo.py
 ```
+
+## Demo Video
+
+https://youtu.be/HNTxHCYaSfk
 
 ## Results Summary
 
