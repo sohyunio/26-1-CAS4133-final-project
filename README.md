@@ -51,16 +51,22 @@ https://youtu.be/HNTxHCYaSfk
 
 ## Results Summary
 
-| Model     | Method          | ASR (↓) | Latency | Fidelity (↑) |
-|-----------|----------------|---------|---------|--------------|
-| Qwen-0.5B | Baseline 0     | 46.7%   | 1.83s   | 100%         |
-| Qwen-0.5B | Baseline 1     | 20.0%   | 2.34s   | 100%         |
-| Qwen-0.5B | **Ours**       | **0.0%**| 1.03s   | 100%         |
-| Qwen-3B   | Baseline 0     | 66.7%   | 2.58s   | 100%         |
-| Qwen-3B   | Baseline 1     | —       | —       | —            |
-| Qwen-3B   | **Ours**       | **0.0%**| 1.33s   | 100%         |
+| Model     | Method     | ASR (↓) | Latency | Fidelity (↑) |
+|-----------|-----------|---------|---------|-------------|
+| Qwen-0.5B | Baseline 0 | 40.9%  | 0.97s   | 100%        |
+| Qwen-0.5B | Baseline 1 | 40.9%  | 0.96s   | 100%        |
+| Qwen-0.5B | **Ours**   | **0.0%** | **0.50s** | 100%   |
+| Qwen-3B   | Baseline 0 | 40.9%  | 1.84s   | 100%        |
+| Qwen-3B   | Baseline 1 | 27.3%  | 1.14s   | 100%        |
+| Qwen-3B   | **Ours**   | **4.5%** | **0.98s** | 100%   |
 
-**Key finding:** Larger models (3B) are *more* vulnerable at baseline (66.7% vs 46.7%) because stronger instruction-following ability makes them more susceptible to injected commands. The hybrid defense reduces ASR to 0% regardless of model size.
+
+**Key finding:** 0.5B Ours achieves 0.0% ASR while reducing latency by 48% 
+(0.97s → 0.50s). Stage 1 static filter removes injection content before 
+LLM inference, shortening input tokens and improving speed alongside security.
+Qwen-3B Baseline 1 (prompt-only) shows limited effectiveness (27.3%), 
+demonstrating that system prompt hardening alone is insufficient.
+Evaluation uses Qwen-3B as LLM-as-judge for reliable ASR measurement.
 
 ## Dataset
 

@@ -1,8 +1,4 @@
 __pycache__/
 *.py[cod]
-
-data
-results
-
 .cache/
 .gradio/
